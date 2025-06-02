@@ -45,18 +45,15 @@ public class LobbyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
-        // Получаем данные из Intent
         roomId = getIntent().getStringExtra("ROOM_ID");
         isHost = getIntent().getBooleanExtra("IS_HOST", false);
 
-        // Получаем ID пользователя
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
             userId = "guest_" + System.currentTimeMillis();
         }
 
-        // Инициализация UI
         tvRoomCode = findViewById(R.id.tvRoomCode);
         tvStatus = findViewById(R.id.tvStatus);
         btnStartGame = findViewById(R.id.btnStartGame);
@@ -70,7 +67,6 @@ public class LobbyActivity extends AppCompatActivity {
         setupRoomListener();
         setupButtons();
 
-        // Если гость - присоединяемся к комнате
         if (!isHost) {
             GameRoomManager gameRoomManager = new GameRoomManager();
             gameRoomManager.joinRoom(roomId, userId, new GameRoomManager.GameRoomCallback() {
@@ -93,7 +89,6 @@ public class LobbyActivity extends AppCompatActivity {
     private void setupRoomListener() {
         roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomId);
 
-        // Таймаут 30 секунд на подключение
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isGameStarting && isHost) {
                 Toast.makeText(this, "Не удалось подключить второго игрока", Toast.LENGTH_SHORT).show();
@@ -108,9 +103,7 @@ public class LobbyActivity extends AppCompatActivity {
                     showErrorAndFinish("Комната была удалена");
                     return;
                 }
-
                 Log.d(TAG, "Room data changed: " + snapshot.toString());
-
                 Room room = snapshot.getValue(Room.class);
                 if (room != null) {
                     updateRoomState(room);
@@ -127,7 +120,6 @@ public class LobbyActivity extends AppCompatActivity {
     }
 
     private void updateRoomState(Room room) {
-        // Проверяем подключение второго игрока
         boolean hasSecondPlayer = room.getPlayer2Id() != null &&
                 !room.getPlayer2Id().isEmpty() &&
                 !room.getPlayer2Id().equals(room.getCreatorId());
@@ -141,7 +133,6 @@ public class LobbyActivity extends AppCompatActivity {
             if (isHost) {
                 btnStartGame.setEnabled(true);
 
-                // Автоматический старт через 2 секунды
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (!isGameStarting) {
                         startGame();
@@ -153,27 +144,11 @@ public class LobbyActivity extends AppCompatActivity {
             btnStartGame.setEnabled(false);
         }
 
-        // Проверка старта игры
         if (room.getGameState() != null &&
                 "started".equals(room.getGameState().get("status"))) {
             startOnlineGame();
         }
     }
-
-    /*private void joinRoom() {
-        Log.d(TAG, "Joining room as guest: " + roomId);
-
-        roomRef.child("player2Id").setValue(userId)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "Successfully joined room");
-                    } else {
-                        Log.e(TAG, "Error joining room", task.getException());
-                        Toast.makeText(LobbyActivity.this,
-                                "Ошибка подключения к комнате", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }*/
 
     private void setupButtons() {
         btnCopyCode.setOnClickListener(v -> {
@@ -191,9 +166,7 @@ public class LobbyActivity extends AppCompatActivity {
     private void startGame() {
         if (isGameStarting) return;
         isGameStarting = true;
-
         Log.d(TAG, "Starting game in room: " + roomId);
-
         roomRef.child("gameState").child("status").setValue("started")
                 .addOnCompleteListener(task -> {
                     if (!task.isSuccessful()) {
@@ -223,12 +196,9 @@ public class LobbyActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "Destroying LobbyActivity");
-
         if (roomRef != null && roomListener != null) {
             roomRef.removeEventListener(roomListener);
         }
-
-        // Удаляем комнату только если хост и игра не началась
         if (isHost && !isGameStarting) {
             Log.d(TAG, "Deleting room: " + roomId);
             FirebaseDatabase.getInstance().getReference("rooms").child(roomId).removeValue();
