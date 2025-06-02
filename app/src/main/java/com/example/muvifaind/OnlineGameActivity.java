@@ -58,8 +58,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class OnlineGameActivity extends AppCompatActivity {
-
-    // UI Components
     private TextView filmTitleTextView;
     private TextView filmGenreTextView;
     private ImageView filmPosterImageView;
@@ -75,14 +73,12 @@ public class OnlineGameActivity extends AppCompatActivity {
     private TextView matchFilmTitleTextView;
     private TextView matchFilmGenreTextView;
 
-    // Swipe Handling
     private float xDown, yDown;
     private VelocityTracker velocityTracker;
     private int touchSlop;
     private boolean isDragging = false;
     private boolean isAnimationRunning = false;
 
-    // Game Data
     private FilmData currentFilm;
     private final List<FilmData> allFilms = new ArrayList<>();
     private List<FilmData> gameFilms = new ArrayList<>();
@@ -94,7 +90,6 @@ public class OnlineGameActivity extends AppCompatActivity {
     private final Set<String> allGenres = new HashSet<>();
     private boolean isFilterApplied = false;
 
-    // Firebase
     private String roomId;
     private boolean isHost;
     private DatabaseReference gameRef;
@@ -102,12 +97,10 @@ public class OnlineGameActivity extends AppCompatActivity {
     private String playerId;
     private String opponentId = "";
 
-    // API
     private static final String API_KEY = "VNEKRPQ-2TPMGKD-GJ67BDV-N9R9MAB";
     private static final String API_URL = "https://api.kinopoisk.dev/v1.3/movie?page=1&limit=500";
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
-    // Constants
     private static final float SWIPE_VELOCITY_THRESHOLD = 1000;
     private static final float MAX_ROTATION = 20f;
     private static final String TAG = "OnlineGameActivity";
@@ -117,11 +110,9 @@ public class OnlineGameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_online_game);
 
-        // Get intent extras
         roomId = getIntent().getStringExtra("ROOM_ID");
         isHost = getIntent().getBooleanExtra("IS_HOST", false);
 
-        // Generate player IDs
         playerId = isHost ? "player1" : "player2";
         opponentId = isHost ? "player2" : "player1";
 
@@ -143,18 +134,15 @@ public class OnlineGameActivity extends AppCompatActivity {
         btnFilter = findViewById(R.id.btnFilter);
         tvLoadingStatus = findViewById(R.id.tvLoadingStatus);
 
-        // Новая карточка для совпадения
         matchMovieCard = findViewById(R.id.matchMovieCard);
         matchFilmPosterImageView = findViewById(R.id.matchFilmPosterImageView);
         matchFilmTitleTextView = findViewById(R.id.matchFilmTitleTextView);
         matchFilmGenreTextView = findViewById(R.id.matchFilmGenreTextView);
 
-        // Настройка внешнего вида надписи о совпадении
         tvMatchFound.setTextColor(getResources().getColor(android.R.color.white));
         tvMatchFound.setTextSize(32);
         tvMatchFound.setVisibility(View.GONE);
 
-        // Скрываем карточку совпадения
         matchMovieCard.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE);
         tvLoadingStatus.setVisibility(View.GONE);
@@ -322,7 +310,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                         }
                     }
 
-                    // Send filter to Firebase
                     sendFilterToFirebase();
                 })
                 .setNegativeButton("Сбросить", (dialog, which) -> {
@@ -346,10 +333,8 @@ public class OnlineGameActivity extends AppCompatActivity {
             return;
         }
 
-        // Reset game state
         resetGameState();
 
-        // Apply filtering
         if (isFilterApplied) {
             gameFilms.clear();
             for (FilmData film : allFilms) {
@@ -366,14 +351,11 @@ public class OnlineGameActivity extends AppCompatActivity {
             gameFilms = new ArrayList<>(allFilms);
         }
 
-        // Shuffle films with fixed seed for both players
         Collections.shuffle(gameFilms, new Random(roomId.hashCode()));
 
-        // Add all films to queue
         filmsQueue.clear();
         filmsQueue.addAll(gameFilms);
 
-        // Show first film
         showNextFilm();
     }
 
@@ -384,13 +366,11 @@ public class OnlineGameActivity extends AppCompatActivity {
         filmsQueue.clear();
         currentFilm = null;
 
-        // Reset UI
         tvMatchFound.setVisibility(View.GONE);
         matchMovieCard.setVisibility(View.GONE);
         movieCard.setVisibility(View.VISIBLE);
         cardOutline.setVisibility(View.VISIBLE);
 
-        // Clear Firebase actions
         if (gameRef != null) {
             gameRef.child("actions").child(playerId).removeValue();
         }
@@ -410,7 +390,6 @@ public class OnlineGameActivity extends AppCompatActivity {
 
     private void showNextFilm() {
         if (filmsQueue.isEmpty()) {
-            // End of films - check for matches
             checkForMatches();
             return;
         }
@@ -537,13 +516,11 @@ public class OnlineGameActivity extends AppCompatActivity {
         String filmKey = currentFilm.toKey();
         if (isLike) {
             likedFilms.add(filmKey);
-            // Check if opponent also liked this film
             if (opponentLikedFilms.contains(filmKey)) {
                 showMatchFound(currentFilm);
             }
         }
 
-        // Send action to Firebase
         gameRef.child("actions").child(playerId).child(filmKey).setValue(isLike ? "like" : "dislike");
     }
 
@@ -609,7 +586,6 @@ public class OnlineGameActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) return;
 
-                // Check opponent actions
                 DataSnapshot opponentActions = snapshot.child("actions").child(opponentId);
                 if (opponentActions.exists()) {
                     for (DataSnapshot filmSnapshot : opponentActions.getChildren()) {
@@ -617,8 +593,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                         String action = filmSnapshot.getValue(String.class);
                         if ("like".equals(action)) {
                             opponentLikedFilms.add(filmKey);
-
-                            // Check if we also liked this film
                             if (likedFilms.contains(filmKey)) {
                                 // Find film object
                                 for (FilmData film : gameFilms) {
@@ -632,7 +606,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                     }
                 }
 
-                // Check for filter changes
                 if (snapshot.child("filterApplied").exists()) {
                     boolean newFilterApplied = snapshot.child("filterApplied").getValue(Boolean.class);
                     Set<String> newSelectedGenres = new HashSet<>();
@@ -646,7 +619,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                         }
                     }
 
-                    // Apply only if filters actually changed
                     if (newFilterApplied != isFilterApplied || !newSelectedGenres.equals(selectedGenres)) {
                         isFilterApplied = newFilterApplied;
                         selectedGenres = newSelectedGenres;
@@ -654,7 +626,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                     }
                 }
 
-                // Check if game is ending
                 if ("ended".equals(snapshot.child("status").getValue(String.class))) {
                     leaveGame();
                     Toast.makeText(OnlineGameActivity.this,
@@ -676,7 +647,6 @@ public class OnlineGameActivity extends AppCompatActivity {
         if (isMatchFound) return;
         isMatchFound = true;
 
-        // Update UI
         tvMatchFound.setVisibility(View.VISIBLE);
         matchMovieCard.setVisibility(View.VISIBLE);
         movieCard.setVisibility(View.GONE);
@@ -684,7 +654,6 @@ public class OnlineGameActivity extends AppCompatActivity {
 
         tvMatchFound.setText("Совпадение!");
 
-        // Заполняем карточку фильма для совпадения
         matchFilmTitleTextView.setText(film.getTitle());
         matchFilmGenreTextView.setText(film.getGenre());
         Picasso.get()
@@ -693,15 +662,12 @@ public class OnlineGameActivity extends AppCompatActivity {
                 .error(R.drawable.ic_error)
                 .into(matchFilmPosterImageView);
 
-        // Animate match celebration
         animateMatchCelebration();
 
-        // Notify opponent
         gameRef.child("match").setValue(film.toKey());
     }
 
     private void animateMatchCelebration() {
-        // Анимация надписи
         tvMatchFound.setScaleX(0.8f);
         tvMatchFound.setScaleY(0.8f);
         tvMatchFound.animate()
@@ -716,7 +682,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                         .start())
                 .start();
 
-        // Анимация карточки
         matchMovieCard.setScaleX(0.8f);
         matchMovieCard.setScaleY(0.8f);
         matchMovieCard.animate()
@@ -729,7 +694,6 @@ public class OnlineGameActivity extends AppCompatActivity {
     private void checkForMatches() {
         if (isMatchFound) return;
 
-        // Find common liked films
         Set<String> commonFilms = new HashSet<>(likedFilms);
         commonFilms.retainAll(opponentLikedFilms);
 
@@ -743,7 +707,6 @@ public class OnlineGameActivity extends AppCompatActivity {
                 }
             }
         } else {
-            // No matches found
             showNoMatchDialog();
         }
     }
@@ -766,18 +729,15 @@ public class OnlineGameActivity extends AppCompatActivity {
             gameRef.removeEventListener(gameListener);
         }
 
-        // Reset filter state
         isFilterApplied = false;
         selectedGenres.clear();
         gameRef.child("filterApplied").setValue(false);
         gameRef.child("selectedGenres").removeValue();
 
-        // Notify opponent that game is ending
         if (!isMatchFound) {
             gameRef.child("status").setValue("ended");
         }
 
-        // Remove room if host
         if (isHost) {
             FirebaseDatabase.getInstance().getReference("rooms").child(roomId).removeValue();
         }
