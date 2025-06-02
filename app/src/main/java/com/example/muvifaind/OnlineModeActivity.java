@@ -31,8 +31,6 @@ public class OnlineModeActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         Button btnJoin = findViewById(R.id.btnJoinRoom);
         Button btnCreate = findViewById(R.id.btnCreateRoom);
-
-        // Получаем ID пользователя
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         } else {
@@ -52,7 +50,6 @@ public class OnlineModeActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        // Переходим сразу в лобби как гость
         goToLobby(roomCode, false);
     }
 
@@ -60,7 +57,6 @@ public class OnlineModeActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         String roomCode = generateRoomCode(4);
 
-        // Создаем комнату
         Room newRoom = new Room(roomCode, userId);
 
         DatabaseReference roomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomCode);
