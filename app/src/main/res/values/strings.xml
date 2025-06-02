@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MuviFaind</string>
+    <string name="back_button_description">Назад</string>
+    <string name="favorites_button_description">Избранное</string>
+    <string name="choose_genres">Выберите жанры</string>
+    <string name="apply">Применить</string>
+    <string name="reset">Сбросить</string>
+    <string name="cancel">Отмена</string>
+
+</resources>

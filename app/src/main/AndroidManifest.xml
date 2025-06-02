@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.muvifaind">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MovieFind"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+
+        <!-- Главная активность -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Онлайн-режим -->
+        <activity
+            android:name=".OnlineModeActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Лобби -->
+        <activity
+            android:name=".LobbyActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Игровой экран -->
+        <activity
+            android:name=".OnlineGameActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Избранное -->
+        <activity
+            android:name=".FavoritesActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <!-- Одиночный режим -->
+        <activity
+            android:name=".SinglePlayerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+    </application>
+
+</manifest>

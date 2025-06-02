@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "80615307825",
+    "project_id": "moviematch-19419",
+    "storage_bucket": "moviematch-19419.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:80615307825:android:31a4162c7c16c759b8b310",
+        "android_client_info": {
+          "package_name": "com.example.muvifaind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl4s5ckYxs_U1sSXfFdkgd0QxFntoV12U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
