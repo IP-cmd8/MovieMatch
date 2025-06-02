@@ -48,7 +48,6 @@ import java.util.concurrent.Executors;
 
 public class SinglePlayerActivity extends AppCompatActivity {
 
-    // UI Components
     private TextView filmTitleTextView;
     private TextView filmGenreTextView;
     private ImageView filmPosterImageView;
@@ -58,25 +57,21 @@ public class SinglePlayerActivity extends AppCompatActivity {
     private ImageButton btnFavorites;
     private TextView tvFilterIndicator;
 
-    // Swipe Handling
     private float xDown, yDown;
     private VelocityTracker velocityTracker;
     private int touchSlop;
     private boolean isDragging = false;
     private boolean isAnimationRunning = false;
 
-    // Data
     private FilmData currentFilm;
     private List<FilmData> loadedFilms = new ArrayList<>();
     private Set<String> shownFilms = new HashSet<>();
     private List<String> selectedGenres = new ArrayList<>();
     private Set<String> allGenres = new HashSet<>();
 
-    // Threading
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private volatile boolean isTaskRunning = false;
 
-    // Constants
     private static final float SWIPE_VELOCITY_THRESHOLD = 1000;
     private static final float MAX_ROTATION = 20f;
     private static final String PREFS_NAME = "FavoritesPrefs";
@@ -135,7 +130,6 @@ public class SinglePlayerActivity extends AppCompatActivity {
 
         updateFilterIndicator();
 
-        // Оптимизация аппаратного ускорения
         movieCard.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         cardOutline.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     }
@@ -585,7 +579,6 @@ public class SinglePlayerActivity extends AppCompatActivity {
         }
     }
 
-    // Оставлен для совместимости (можно удалить после полного перехода на ExecutorService)
     private class FetchFilmsTask extends AsyncTask<Void, Void, List<FilmData>> {
         private Exception exception;
 
