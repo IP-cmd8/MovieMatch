@@ -6,11 +6,10 @@ import java.util.Map;
 public class Room {
     private String roomId;
     private String creatorId;
-    private String player2Id = ""; // Важно: инициализировать пустой строкой!
+    private String player2Id = "";
     private Map<String, Object> gameState = new HashMap<>();
     private long createdAt;
 
-    // Обязательный пустой конструктор для Firebase
     public Room() {
         this.gameState.put("status", "waiting");
     }
@@ -23,7 +22,6 @@ public class Room {
         this.gameState.put("status", "waiting");
     }
 
-    // Геттеры и сеттеры
     public String getRoomId() { return roomId; }
     public void setRoomId(String roomId) { this.roomId = roomId; }
 
